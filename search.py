@@ -2,54 +2,6 @@ import sys
 import math
 max_possible_value = sys.maxsize
 
-def Greedy_BFS(maze, start, goal):
-    path = []
-    explored = []
-    if start == goal:
-        return path, explored
-
-    path.append(start)
-
-    path_cost = get_manhattan_heuristic(maze, start, goal)
-    frontier = []
-    frontier.append((path_cost, path))
-
-    while len(frontier) > 0:
-        # Pop frontier
-        path_cost_now, path_till_now = pop_frontier(frontier)
-
-        current_node = path_till_now[-1]
-
-        # Push to explored
-        explored.append(current_node)
-
-        # Check node is goal
-        if current_node == goal:
-            return path_till_now, explored
-
-
-        childs = maze[current_node]
-
-        # Process neighbors in increasing order
-        childs.sort()
-
-        for child in childs:
-            # Open child path
-            path_to_child = path_till_now.copy()
-            path_to_child.append(child)
-
-            # Update new cost
-            path_new_cost = get_manhattan_heuristic(maze, child, goal)
-            new_path_child = (path_new_cost, path_to_child)
-
-            # Check if child node exists in frontier
-            child_is_in_frontier, position, path_old_cost = get_child_frontier(child, frontier)
-
-            if (child not in explored) and not child_is_in_frontier:
-                # Push into frontier
-                frontier.append(new_path_child)
-    return path, explored
-
 def BFS(maze, start, goal):
     path = []
     explored = []
@@ -127,6 +79,8 @@ def UCS(maze, start, goal):
 
             #Update new cost
             path_new_cost = 1 + path_cost_now
+
+            #Update new path
             new_path_child = (path_new_cost, path_to_child)
 
             #Check if child node exists in frontier
@@ -140,7 +94,7 @@ def UCS(maze, start, goal):
                 if path_new_cost < path_old_cost:
                     frontier.pop(position)
                     frontier.append(new_path_child)
-    return path, explored
+    return [], explored
 
 def IDS(maze, start, goal, maxDepth):
     path = []
@@ -169,6 +123,113 @@ def DLS(maze, start, goal, parent, path, explored, limit):
                 path.append(child)
                 return True
     return False
+
+def Greedy_BFS(maze, start, goal):
+    path = []
+    explored = []
+    if start == goal:
+        return path, explored
+
+    path.append(start)
+
+    path_cost = 0
+    frontier = []
+    frontier.append((path_cost, path))
+
+    while len(frontier) > 0:
+        # Pop frontier
+        _, path_till_now = pop_frontier(frontier)
+
+        current_node = path_till_now[-1]
+
+        # Push to explored
+        explored.append(current_node)
+
+        # Check node is goal
+        if current_node == goal:
+            return path_till_now, explored
+
+
+        childs = maze[current_node]
+
+        # Process neighbors in increasing order
+        childs.sort()
+
+        for child in childs:
+            # Open child path
+            path_to_child = path_till_now.copy()
+            path_to_child.append(child)
+
+            # Update new cost
+            path_new_cost = get_manhattan_heuristic(maze, child, goal)
+
+            #Update new path
+            new_path_child = (path_new_cost, path_to_child)
+
+            # Check if child node exists in frontier
+            child_is_in_frontier, _, _ = get_child_frontier(child, frontier)
+
+            if (child not in explored) and not child_is_in_frontier:
+                # Push into frontier
+                frontier.append(new_path_child)
+
+    return [], explored
+
+def A(maze, start, goal):
+    path = []
+    explored = []
+    if start == goal:
+        return path, explored
+
+    path.append(start)
+
+    path_cost = get_manhattan_heuristic(maze, start, goal)
+    frontier = []
+    frontier.append((path_cost, path))
+
+    while len(frontier) > 0:
+        # Pop frontier
+        path_cost_now, path_till_now = pop_frontier(frontier)
+
+        current_node = path_till_now[-1]
+
+        #Update cost by minusing the past heristic of current node
+        path_cost_now -= get_manhattan_heuristic(maze, current_node, goal)
+
+        # Push to explored
+        explored.append(current_node)
+
+        # Check node is goal
+        if current_node == goal:
+            return path_till_now, explored
+
+        childs = maze[current_node]
+
+        # Process neighbors in increasing order
+        childs.sort()
+
+        for child in childs:
+            # Open child path
+            path_to_child = path_till_now.copy()
+            path_to_child.append(child)
+
+            # Update new cost
+            path_new_cost = 1 + path_cost_now + get_manhattan_heuristic(maze, child, goal)
+
+            #Update new path
+            new_path_child = (path_new_cost, path_to_child)
+
+            # Check if child node exists in frontier
+            child_is_in_frontier, position, path_old_cost = get_child_frontier(child, frontier)
+
+            if (child not in explored) and not child_is_in_frontier:
+                # Push into frontier
+                frontier.append(new_path_child)
+            elif child_is_in_frontier:
+                if path_new_cost < path_old_cost:
+                    frontier.pop(position)
+                    frontier.append(new_path_child)
+    return [], explored
 
 def pop_frontier(frontier):
     min = max_possible_value

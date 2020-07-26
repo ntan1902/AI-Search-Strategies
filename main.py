@@ -1,9 +1,12 @@
 import input
 import search
-
+import sys
 if __name__ == '__main__':
     """Initialize maze, goal"""
-    file = input.inputFile("input.txt", "r")
+    if len(sys.argv) != 2:
+        file = input.inputFile("input.txt", "r")
+    else:
+        file = input.inputFile(sys.argv[1], "r")
     maze = file[0]
     goal = file[1]
     start = 0
@@ -16,7 +19,7 @@ if __name__ == '__main__':
     if len(path_bfs) > 0:
         print(f"Path: {path_bfs}")
     else:
-        print(f"{start} can not reach {goal}")
+        print("No solution")
     print()
 
 
@@ -27,7 +30,7 @@ if __name__ == '__main__':
     if len(path_ucs) > 0:
         print(f"Path: {path_ucs}")
     else:
-        print(f"{start} can not reach {goal}")
+        print("No solution")
     print()
 
 
@@ -38,7 +41,7 @@ if __name__ == '__main__':
     if len(path_ids) > 0:
         print(f"Path: {path_ids}")
     else:
-        print(f"{start} can not reach {goal}")
+        print("No solution")
     print()
 
 
@@ -49,15 +52,15 @@ if __name__ == '__main__':
     if len(path_gbfs) > 0:
         print(f"Path: {path_gbfs}")
     else:
-        print(f"{start} can not reach {goal}")
+        print("No solution")
     print()
 
     print("============ A* Search ================")
-    path_a, explored_a = search.A(maze, start, goal)
+    path_a, explored_a = search.Tree_A(maze, start, goal)
     print(f"Time to escape the maze: {len(explored_a)}")
     print(f"Explored nodes: {explored_a}")
     if len(path_a) > 0:
         print(f"Path: {path_a}")
     else:
-        print(f"{start} can not reach {goal}")
+        print("No solution")
     print()

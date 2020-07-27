@@ -4,7 +4,7 @@ import sys
 if __name__ == '__main__':
     """Initialize maze, goal"""
     if len(sys.argv) != 2:
-        file = input.inputFile("INPUT/Maze5x5.txt", "r")
+        file = input.inputFile("INPUT/Maze4x4.txt", "r")
     else:
         print(sys.argv[1])
         file = input.inputFile(sys.argv[1], "r")

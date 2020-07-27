@@ -5,6 +5,8 @@ max_possible_value = sys.maxsize
 
 
 def BFS(maze, start, goal):
+    if goal >= len(maze):
+        return [], []
     path = []
     explored = []
     parent = 0
@@ -62,6 +64,8 @@ def child_in_frontier_BFS(child, frontier):
     return False
 
 def UCS(maze, start, goal):
+    if goal >= len(maze):
+        return [], []
     path = []
     explored = []
     parent = 0
@@ -127,6 +131,8 @@ def UCS(maze, start, goal):
 
 
 def IDS(maze, start, goal, maxDepth):
+    if goal >= len(maze):
+        return [], []
     path = []
     explored = []
     explored_depth = []
@@ -164,6 +170,9 @@ def DLS(maze, start, goal, parent, path, explored, limit):
 
 
 def Greedy_BFS(maze, start, goal):
+    if goal >= len(maze):
+        return [], []
+
     path = []
     explored = []
     parent = 0
@@ -225,9 +234,11 @@ def Greedy_BFS(maze, start, goal):
 
 
 def Tree_A(maze, start, goal):
+    if goal >= len(maze):
+        return [], []
     path = []
     explored = []
-    parent = 0
+    parent = []
     path.append(start)
 
     if start == goal:
@@ -244,9 +255,9 @@ def Tree_A(maze, start, goal):
         # Get the current node
         current_node = path_till_now[-1]
 
-        # Get the previous node
+        # Get the previous path
         if len(path_till_now) > 1:
-            parent = path_till_now[-2]
+            parent = path_till_now[:-1]
 
         # Update cost by minusing the past heristic of current node
         path_cost_now -= get_manhattan_heuristic(maze, current_node, goal)
@@ -260,14 +271,13 @@ def Tree_A(maze, start, goal):
 
         childs = maze[current_node].copy()
 
-        # Check if parent is children
-        if parent in childs:
-            childs.remove(parent)
-
         # Process neighbors in increasing order
         childs.sort()
 
         for child in childs:
+            if child in parent:
+                continue
+
             # Open child path
             path_to_child = path_till_now.copy()
             path_to_child.append(child)

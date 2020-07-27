@@ -1,15 +1,19 @@
 def inputFile(filename, mode):
+    maze = []
     try:
-        f = open(filename, mode)
+        with open(filename, mode) as f:
+            # Input size
+            size = int(f.readline())
+
+            # Input maze
+            for _ in range(size * size):
+                d = f.readline()
+                maze.append(list(map(int, d.split())))
+
+            # Input goal
+            goal = int(f.readline())
+
     except IOError as err:
         print(err)
 
-    size = int(f.readline())
-    maze = []
-
-    for _ in range(size*size):
-        d = f.readline()
-        maze.append(list(map(int, d.split())))
-    goal = int(f.readline())
-    f.close()
     return maze, goal

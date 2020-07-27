@@ -29,7 +29,7 @@ def BFS(maze, start, goal):
 
         # Push to explored
         explored.append(current_node)
-        childs = maze[current_node]
+        childs = maze[current_node].copy()
 
         # Check if parent is children
         if parent in childs:
@@ -43,7 +43,7 @@ def BFS(maze, start, goal):
             path_to_child = path_till_now.copy()
             path_to_child.append(child)
 
-            if (child not in explored) and (child not in frontier):
+            if (child not in explored) and (not child_in_frontier_BFS(child, frontier)):
                 # if find goal then update path and return
                 if child == goal:
                     path_till_now.append(child)
@@ -54,6 +54,12 @@ def BFS(maze, start, goal):
                 frontier.append(path_to_child)
     return [], explored
 
+def child_in_frontier_BFS(child, frontier):
+    for i in range(len(frontier)):
+        path = frontier[i]
+        if path[-1] == child:
+            return True
+    return False
 
 def UCS(maze, start, goal):
     path = []
@@ -86,7 +92,7 @@ def UCS(maze, start, goal):
         if current_node == goal:
             return path_till_now, explored
 
-        childs = maze[current_node]
+        childs = maze[current_node].copy()
 
         # Check if parent is children
         if parent in childs:
@@ -123,8 +129,13 @@ def UCS(maze, start, goal):
 def IDS(maze, start, goal, maxDepth):
     path = []
     explored = []
+    explored_depth = []
+    parent = []
     for limit in range(maxDepth):
-        if (DLS(maze, start, goal, 0, path, explored, limit)):
+        find_goal = DLS(maze, start, goal, parent, path, explored_depth, limit)
+        explored.append(explored_depth.copy())
+        explored_depth.clear()
+        if find_goal == True:
             path.append(start)
             path.reverse()
             return path, explored
@@ -141,9 +152,11 @@ def DLS(maze, start, goal, parent, path, explored, limit):
     childs.sort()
 
     for child in childs:
-        if child != parent:
+        if child not in parent:
             # Start node is now a parent of child
-            find_goal = DLS(maze, child, goal, start, path, explored, limit - 1)
+            parent.append(start)
+            find_goal = DLS(maze, child, goal, parent, path, explored, limit - 1)
+            parent.remove(start)
             if find_goal == True:
                 path.append(child)
                 return True
@@ -181,7 +194,7 @@ def Greedy_BFS(maze, start, goal):
         if current_node == goal:
             return path_till_now, explored
 
-        childs = maze[current_node]
+        childs = maze[current_node].copy()
 
         # Check if parent is children
         if parent in childs:
@@ -245,7 +258,7 @@ def Tree_A(maze, start, goal):
         if current_node == goal:
             return path_till_now, explored
 
-        childs = maze[current_node]
+        childs = maze[current_node].copy()
 
         # Check if parent is children
         if parent in childs:
@@ -292,11 +305,8 @@ def pop_frontier(frontier):
             paths.clear()
             paths.append(path)
 
-    # Sort the path with the length
-    paths = sorted(paths, key=lambda x: len(x))
-
-    # Get the longest path
-    paths.reverse()
+    # Sort the path with the last element
+    paths = sorted(paths, key=lambda x: x[-1])
 
     path_res = paths[0]
     frontier.remove((min, paths[0]))
@@ -313,7 +323,7 @@ def get_child_frontier(child, frontier):
 
 
 def get_manhattan_heuristic(maze, start, goal):
-    # 8x8
+    # N*N
     size_maze = int(math.sqrt(len(maze)))
 
     j_start, i_start = divmod(start, size_maze)

@@ -9,7 +9,6 @@ def BFS(maze, start, goal):
         return [], []
     path = []
     explored = []
-    parent = 0
     path.append(start)
     if start == goal:
         return path, explored
@@ -25,17 +24,9 @@ def BFS(maze, start, goal):
         # Get the current node
         current_node = path_till_now[-1]
 
-        # Get the previous node
-        if len(path_till_now) > 1:
-            parent = path_till_now[-2]
-
         # Push to explored
         explored.append(current_node)
         childs = maze[current_node].copy()
-
-        # Check if parent is children
-        if parent in childs:
-            childs.remove(parent)
 
         # Process neighbors in increasing order
         childs.sort()
@@ -68,7 +59,6 @@ def UCS(maze, start, goal):
         return [], []
     path = []
     explored = []
-    parent = 0
     path.append(start)
 
     if start == goal:
@@ -85,10 +75,6 @@ def UCS(maze, start, goal):
         # Get the current node
         current_node = path_till_now[-1]
 
-        # Get the previous node
-        if len(path_till_now) > 1:
-            parent = path_till_now[-2]
-
         # Push to explored
         explored.append(current_node)
 
@@ -97,10 +83,6 @@ def UCS(maze, start, goal):
             return path_till_now, explored
 
         childs = maze[current_node].copy()
-
-        # Check if parent is children
-        if parent in childs:
-            childs.remove(parent)
 
         # Process neighbors in increasing order
         childs.sort()
@@ -139,6 +121,8 @@ def IDS(maze, start, goal, maxDepth):
     parent = []
     for limit in range(maxDepth):
         find_goal = DLS(maze, start, goal, parent, path, explored_depth, limit)
+        explored_depth.append(start)
+
         explored.append(explored_depth.copy())
         explored_depth.clear()
         if find_goal == True:
@@ -149,7 +133,7 @@ def IDS(maze, start, goal, maxDepth):
 
 
 def DLS(maze, start, goal, parent, path, explored, limit):
-    explored.append(start)
+
     if start == goal:
         return True
     if limit == 0:
@@ -162,6 +146,7 @@ def DLS(maze, start, goal, parent, path, explored, limit):
             # Start node is now a parent of child
             parent.append(start)
             find_goal = DLS(maze, child, goal, parent, path, explored, limit - 1)
+            explored.append(child)
             parent.remove(start)
             if find_goal == True:
                 path.append(child)
@@ -175,7 +160,6 @@ def Greedy_BFS(maze, start, goal):
 
     path = []
     explored = []
-    parent = 0
     path.append(start)
 
     if start == goal:
@@ -192,10 +176,6 @@ def Greedy_BFS(maze, start, goal):
         # Get the current node
         current_node = path_till_now[-1]
 
-        # Get the previous node
-        if len(path_till_now) > 1:
-            parent = path_till_now[-2]
-
         # Push to explored
         explored.append(current_node)
 
@@ -204,10 +184,6 @@ def Greedy_BFS(maze, start, goal):
             return path_till_now, explored
 
         childs = maze[current_node].copy()
-
-        # Check if parent is children
-        if parent in childs:
-            childs.remove(parent)
 
         # Process neighbors in increasing order
         childs.sort()
@@ -233,12 +209,11 @@ def Greedy_BFS(maze, start, goal):
     return [], explored
 
 
-def Tree_A(maze, start, goal):
+def A(maze, start, goal):
     if goal >= len(maze):
         return [], []
     path = []
     explored = []
-    parent = []
     path.append(start)
 
     if start == goal:
@@ -254,10 +229,6 @@ def Tree_A(maze, start, goal):
 
         # Get the current node
         current_node = path_till_now[-1]
-
-        # Get the previous path
-        if len(path_till_now) > 1:
-            parent = path_till_now[:-1]
 
         # Update cost by minusing the past heristic of current node
         path_cost_now -= get_manhattan_heuristic(maze, current_node, goal)
@@ -275,9 +246,6 @@ def Tree_A(maze, start, goal):
         childs.sort()
 
         for child in childs:
-            if child in parent:
-                continue
-
             # Open child path
             path_to_child = path_till_now.copy()
             path_to_child.append(child)
@@ -291,7 +259,7 @@ def Tree_A(maze, start, goal):
             # Check if child node exists in frontier
             child_is_in_frontier, position, path_old_cost = get_child_frontier(child, frontier)
 
-            if not child_is_in_frontier:
+            if (child not in explored) and (not child_is_in_frontier):
                 # Push into frontier
                 frontier.append(new_path_child)
             elif child_is_in_frontier:

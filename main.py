@@ -4,10 +4,11 @@ import sys
 if __name__ == '__main__':
     """Initialize maze, goal"""
     if len(sys.argv) != 2:
-        file = input.inputFile("INPUT/Maze4x4.txt", "r")
+        file = input.inputFile("INPUT/Maze8x8.txt", "r")
     else:
         print(sys.argv[1])
         file = input.inputFile(sys.argv[1], "r")
+
     maze = file[0]
     goal = file[1]
     start = 0
@@ -61,7 +62,7 @@ if __name__ == '__main__':
     print()
 
     print("============ A* Search ================")
-    path_a, explored_a = search.Tree_A(maze, start, goal)
+    path_a, explored_a = search.A(maze, start, goal)
     print(f"Explored nodes: {explored_a}")
     if len(path_a) > 0:
         print(f"Path: {path_a}")
